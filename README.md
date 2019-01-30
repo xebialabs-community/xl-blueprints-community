@@ -24,8 +24,8 @@ To develop new blueprints, fork the blueprints repository then do the following.
 
 ## Docker
 To host your blueprints locally, you can use the `Dockerfile` to run an Apache server:
-1. docker build -t blueprints . && docker run -p 8080:80 -it blueprints
-1. xl blueprint --blueprint-repository-url http://localhost:8080
+1. Build and run: `docker build -t blueprints . && docker run -p 8080:80 -it blueprints`
+1. Use a blueprint `xl blueprint --blueprint-repository-url http://localhost:8080`
 
 
 ## Publish
