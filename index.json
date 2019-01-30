@@ -1,2 +1,7 @@
 [
+  "aws/monolith",
+  "aws/microservice-ecommerce",
+  "aws/datalake",
+  "conjur/xld",
+  "docker/simple-demo-app"
 ]

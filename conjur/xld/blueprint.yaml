@@ -1,0 +1,33 @@
+apiVersion: xl/v1
+kind: Blueprint
+metadata:
+  projectName: Conjur
+  description: |
+    The blueprint to add conjur configuration and environment dictionaries to XL Deploy.
+  author: XebiaLabs
+  version: 1.0
+parameters:
+- name: serverName
+  type: Input
+  description: What is the Server name?
+- name: serverURL
+  type: Input
+  description: What is the Conjur server URL?
+- name: account
+  type: Input
+  description: What is the Conjur account?
+- name: username
+  type: Input
+  description: What is the Conjur username?
+- name: conjurPassword
+  type: Input
+  description: What is the Conjur password/api key?
+  secret: true
+- name: env
+  type: Input
+  description: What is the target environment for the Conjur Dictionary?
+
+files:
+- path: xebialabs/conjur-xld-configuration.yaml.tmpl
+- path: xebialabs/conjur-xld-environment.yaml.tmpl
+- path: xebialabs/conjur-xld-README.md.tmpl

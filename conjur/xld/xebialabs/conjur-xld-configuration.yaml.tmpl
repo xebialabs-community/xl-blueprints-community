@@ -1,0 +1,9 @@
+apiVersion: xl-deploy/v1
+kind: Configuration
+spec:
+- name: {{.serverName}}
+  type: conjur.Server
+  url: {{.serverURL}}
+  account: {{.account}}
+  username: {{.username}}
+  password: {{.conjurPassword}}

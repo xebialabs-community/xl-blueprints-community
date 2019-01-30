@@ -1,0 +1,19 @@
+## Conur configuration and environment dictionaries
+
+The blueprint creates a Conjur Configuration and adds a Conjur Dictionary to a selected environment
+
+### Prerequisites
+
+You will need XL Deploy v8.5+ installed and running.
+
+### Usage
+
+To deploy this blueprint with the XebiaLabs DevOps Platform, follow the steps below:
+
+1. Apply the generated YAML configurations using the XL CLI.
+
+    ```
+    xl apply -f xebialabs.yaml
+    ```
+
+2. Go to XL Deploy, look for the "Configuration/{{.serverName}}" Conjur server, and "Environment/{{.env}}/ConjurDictionary" .

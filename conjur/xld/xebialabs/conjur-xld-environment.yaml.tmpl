@@ -1,0 +1,12 @@
+apiVersion: xl-deploy/v1
+kind: Environments
+spec:
+- name: Conjur Dictionary
+  type: conjur.DynamicDictionary
+  conjurServer: Configuration/{{.serverName}}
+  entries:
+    hostPassword: $conjur:hostPassword
+- name: {{.env}}
+  type: udm.Environment
+  dictionaries:
+  - "~Environments/Conjur Dictionary"
