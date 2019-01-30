@@ -1,0 +1,14 @@
+xl-deploy:
+  username: admin
+  password: admin
+  url: http://localhost:4516/
+xl-release:
+  username: admin
+  password: admin
+  url: http://localhost:5516/
+blueprint-repository:
+  username: ""
+  password: ""
+  # file:// protocol is not supportted so you'll need to run a local http server
+  # E.g. in blueprint directory run: python -m SimpleHTTPServer 3516
+  url: http://localhost:3516
