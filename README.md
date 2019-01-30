@@ -21,6 +21,13 @@ To develop new blueprints, fork the blueprints repository then do the following.
     * ./xl --config ./config.yaml apply -f ./xebialabs/<your template>.yaml
 1. Once development is complete, commit and push the changes
 
+
+## Docker
+To host your blueprints locally, you can use the `Dockerfile` to run an Apache server:
+1. docker build -t blueprints . && docker run -p 8080:80 -it blueprints
+1. xl blueprint --blueprint-repository-url http://localhost:8080
+
+
 ## Publish
 
 Any changes that are dependent on a new XL CLI version should be done only on the development branch. Master branch should only contain published changes. Development branch needs to be synced to master during every official XL-CLI release
