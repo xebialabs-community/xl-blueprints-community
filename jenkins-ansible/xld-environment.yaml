@@ -1,0 +1,73 @@
+---
+apiVersion: xl-deploy/v1
+kind: Environments
+spec:
+- name: Environments/Dev/ACC-1
+  type: udm.Environment
+  members:
+  - Infrastructure/Dev/AccServer-1/JBoss
+  - Infrastructure/Dev/AccServer-1/MySql
+  - Infrastructure/Dev/AccServer-1/Apache
+  dictionaries:
+  - Environments/Dictionaries/PetPortal-Dict-DEV
+- name: Environments/Dev/ACC-2
+  type: udm.Environment
+  members:
+  - Infrastructure/Dev/AccServer-2/MySql
+  - Infrastructure/Dev/AccServer-2/Apache
+  - Infrastructure/Dev/AccServer-2/JBoss
+  dictionaries:
+  - Environments/Dictionaries/PetPortal-Dict-DEV
+- name: Environments/Dev/DEV
+  type: udm.Environment
+  members:
+  - Infrastructure/Dev/DevServer-1/MySql
+  - Infrastructure/Dev/DevServer-1/JBoss
+  - Infrastructure/Dev/DevServer-1/Apache
+  dictionaries:
+  - Environments/Dictionaries/PetPortal-Dict-DEV
+- name: Environments/Dev/DEV-DOTNET
+  type: udm.Environment
+  members:
+  - Infrastructure/Dev/Windows-1
+  - Infrastructure/Dev/Windows-1/tempdb
+  - Infrastructure/Dev/TestRunner-1/TestRunner
+  - Infrastructure/Dev/Windows-1/iis
+  - Infrastructure/Dev/Windows-1/petclinicdb
+  dictionaries:
+  - Environments/Dictionaries/StockTrader-Dict-DEV
+- name: Environments/Dev/HIPTOOLS
+  type: udm.Environment
+  members:
+  - Infrastructure/Dev/Appserver-1
+  - Infrastructure/Dev/Database-1
+  - Infrastructure/Dev/Webserver-1
+  - Infrastructure/Dev/Docker
+- name: Environments/Dev/QA-1
+  type: udm.Environment
+  members:
+  - Infrastructure/Dev/QAServer-1/JBoss
+  - Infrastructure/Dev/QAServer-1/MySql
+  - Infrastructure/Dev/QAServer-1/Apache
+  dictionaries:
+  - Environments/Dictionaries/PetPortal-Dict-DEV
+- name: Environments/Dev/QA-2
+  type: udm.Environment
+  members:
+  - Infrastructure/Dev/QAServer-2/Apache
+  - Infrastructure/Dev/QAServer-2/MySql
+  - Infrastructure/Dev/QAServer-2/JBoss
+  dictionaries:
+  - Environments/Dictionaries/PetPortal-Dict-DEV
+- name: Environments/Dev/TEST
+  type: udm.Environment
+  members:
+  - Infrastructure/Dev/TestRunner-1/TestRunner
+  - Infrastructure/Dev/Database-1/MySql
+  - Infrastructure/Dev/Appserver-1/JBoss
+  - Infrastructure/Dev/Webserver-1/Apache
+  dictionaries:
+  - Environments/Dictionaries/PetPortal-Dict-TEST
+  triggers:
+  - Configuration/Environments/Test/Triggers/Succesful Deployment Trigger
+  requiresReleaseNotes: true

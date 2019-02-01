@@ -1,0 +1,37 @@
+apiVersion: xl/v1
+kind: Blueprint
+metadata:
+  projectName: Docker Demo Application
+  description: |
+    The blueprint deploys a simple application in 2 Docker containers into your local Docker setup.
+    XL Deploy does the deployment, while XL Release orchestrates everything.
+  author: XebiaLabs
+  version: 1.0
+parameters:
+- name: AppName
+  type: Input
+  description: What is the Application name?
+- name: ContainerPort
+  type: Input
+  description: At what port should the application be exposed in the container?
+  default: 80
+- name: HostPort
+  type: Input
+  description: At what port should the container port be mapped in the host?
+  default: 8181
+- name: BackendDockerImage
+  type: Input
+  description: What is the Docker Image (repo and path) for the Backend service?
+  default: xebialabsunsupported/rest-o-rant-api
+- name: FrontendDockerImage
+  type: Input
+  description: What is the Docker Image (repo and path) for the Frontend service?
+  default: xebialabsunsupported/rest-o-rant-web
+
+
+files:
+- path: xebialabs/xld-environment.yaml.tmpl
+- path: xebialabs/xld-infra.yaml.tmpl
+- path: xebialabs/xld-application.yaml.tmpl
+- path: xebialabs/xlr-pipeline.yaml.tmpl
+- path: xebialabs.yaml
