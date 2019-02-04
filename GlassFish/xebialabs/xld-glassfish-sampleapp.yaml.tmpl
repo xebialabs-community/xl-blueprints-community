@@ -1,0 +1,28 @@
+---
+apiVersion: xl-deploy/v1
+kind: Applications
+spec:
+- directory: Applications/glassfish
+
+---
+apiVersion: xl-deploy/v1
+kind: Applications
+spec:
+- name: Applications/glassfish/sample
+  type: udm.Application
+  lastVersion: 1.0.0
+  children:
+  - name: 1.0.0
+    type: udm.DeploymentPackage
+    deployables:
+    - name: sample.war
+      type: glassfish.War
+      availabilityEnabled: True
+      force: True
+      verify: "true"
+      keepState: treu
+      precompileJsp: True
+      file: !file "artifacts/Applications/glassfish/sample/1.0.0/sample.war/sample.war"
+    - name: sampleRef
+      type: glassfish.ApplicationRefSpec
+      applicationName: sample.war

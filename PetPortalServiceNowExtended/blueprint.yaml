@@ -1,0 +1,41 @@
+apiVersion: xl/v1
+kind: Blueprint
+metadata:
+  projectName: Extended ServiceNow Pipeline
+  description: |
+    This is a more interesting release tempalte that uses ServiceNow.
+  author: XebiaLabs
+  version: 1.0
+parameters:
+- name: FolderName
+  type: Input
+  description: What is the Folder name?
+- name: AppName
+  type: Input
+  description: What is the Application name?
+- name: SNOW_URL
+  type: Input
+  description: What is the Service Now URL?
+- name: SNOW_USERNAME
+  type: Input
+  description: What is the Service Now User Name?
+- name: SNOW_PASSWORD
+  type: Input
+  description: What is the Service Now Password?
+- name: JIRA_URL
+  type: Input
+  description: What is the JIRA URL?
+- name: JIRA_USERNAME
+  type: Input
+  description: What is the JIRA User Name?
+- name: JIRA_PASSWORD
+  type: Input
+  description: What is the JIRA Password?
+
+
+files:
+- path: xebialabs/xlr-configuration.yaml.tmpl
+- path: xebialabs/xlr-pipeline.yaml.tmpl
+- path: xebialabs/values.xlvals.tmpl
+- path: xebialabs/secrets.xlvals.tmpl
+- path: xebialabs.yaml

@@ -1,0 +1,47 @@
+apiVersion: xl/v1
+kind: Blueprint
+metadata:
+  projectName: Extended ServiceNow Pipeline
+  description: |
+    This is a more interesting release tempalte that uses ServiceNow.
+  author: XebiaLabs
+  version: 1.0
+parameters:
+- name: FolderName
+  type: Input
+  description: What is the Folder name?
+- name: AppName
+  type: Input
+  description: What is the Application name?
+- name: gfHost
+  type: Input
+  description: What is the Glass Fish Host name?
+- name: gfHost_USERNAME
+  type: Input
+  description: What is the Glass Fish Host username?
+- name: gfHost_PASSWORD
+  type: Input
+  description: What is the Glass Fish Host password?
+- name: DB_USERNAME
+  type: Input
+  description: What is the DB username?
+- name: DB_PASSWORD
+  type: Input
+  description: What is the DB password?
+- name: APPSERVER_PORT
+  type: Input
+  description: What is the Glass Fish Server Port?
+- name: PETCLINIC_CONTEXT_ROOT
+  type: Input
+  description: What is the application Context Root?
+
+
+files:
+- path: xebialabs/xlr-pipeline.yaml.tmpl
+- path: xebialabs/xld-infrastructure.yaml.tmpl
+- path: xebialabs/xld-environment.yaml.tmpl
+- path: xebialabs/xld-glassfish-sampleapp.yaml.tmpl
+- path: xebialabs/artifacts/Applications/glassfish/sample/1.0.0/sample.war/sample.war
+- path: xebialabs/values.xlvals.tmpl
+- path: xebialabs/secrets.xlvals.tmpl
+- path: xebialabs.yaml

@@ -1,0 +1,97 @@
+{{$app := .AppName | kebabcase}}
+---
+apiVersion: xl-release/v1
+kind: Templates
+spec:
+- directory: {{.FolderName}}
+  children:
+  - template: {{.AppName}}-GlassFish-JIRA
+    scheduledStartDate: 2016-02-02T08:00:00Z
+    phases:
+    - phase: Dev
+      tasks:
+      - name: Open Change Request
+        type: jira.CreateIssue
+        jiraServer: XebiaLabs JIRA
+        project: SAN
+        ^title: Sample Project Ticket
+        ^description: This is for {{.AppName}} project
+        variableMapping:
+          pythonScript.issueId: ${ticket}
+      - name: Deploy to DEV
+        type: xldeploy.Deploy
+        server: XLD Server
+        deploymentPackage: glassfish/sample/1.0.0
+        deploymentEnvironment: glassfish/DEVglassfish
+      - name: Add comment to change request
+        type: jira.UpdateIssue
+        jiraServer: XebiaLabs JIRA
+        issueId: ${ticket}
+        newStatus: IN PROGRESS
+        ^comment: Deployed application {{.AppName}} deplyed to environment DEV
+      color: '#68b749'
+    - phase: Test
+      tasks:
+      - name: Verify application in TEST
+        type: xlrelease.Task
+        description: Verify manually at [http://localhost:9980/sample/](http://localhost:9980/sample/)
+        owner: admin
+      - name: Perform Automated Testing
+        type: xlrelease.ParallelGroup
+        tasks:
+        - name: Smoke Testing
+          type: xlrelease.ScriptTask
+          owner: admin
+          script: |-
+            import time
+            time.sleep(5)
+            print "Performing Smoke Tests"
+        - name: Load Testing
+          type: xlrelease.ScriptTask
+          owner: admin
+          script: |-
+            import time
+            time.sleep(10)
+            print "Performing  Load Tests"
+      - name: Add comment to change request
+        type: jira.UpdateIssue
+        jiraServer: XebiaLabs JIRA
+        issueId: ${ticket}
+        newStatus: RESOLVED
+        ^comment: Deployed application {{.AppName}} deplyed to environment PROD
+      color: '#ff9e3b'
+    tags:
+    - {{.AppName}}
+    - glassfish
+    - jira
+    variables:
+    - type: xlrelease.StringVariable
+      key: buildNumber
+      requiresValue: false
+      showOnReleaseStart: false
+    - type: xlrelease.StringVariable
+      key: ticket
+      requiresValue: false
+      showOnReleaseStart: false
+  - type: xlrelease.Dashboard
+    tiles:
+    - name: Release progress
+      type: xlrelease.ReleaseProgressTile
+    - name: Release health
+      type: xlrelease.ReleaseHealthTile
+      row: 1
+    - name: Release summary
+      type: xlrelease.ReleaseSummaryTile
+    - name: Resource usage
+      type: xlrelease.ResourceUsageTile
+      row: 1
+    - name: Release timeline
+      type: xlrelease.TimelineTile
+      row: 2
+    - name: JIRA issues
+      type: jira.JiraQueryTile
+      row: 0
+      col: 2
+      jiraServer: XebiaLabs JIRA
+      query: type=task&project=SAN
+    parentTemplate: {{.AppName}}-GlassFish-JIRA
