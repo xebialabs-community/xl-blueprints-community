@@ -46,8 +46,3 @@ Run `publish.py` script to update the S3 bucket for development availabvle at [h
 - python & pip is needed for the publish script
 - For updating S3 bucket, you'll need to generate your local AWS credentials file as described [here](https://docs.aws.amazon.com/cli/latest/userguide/cli-config-files.html).
 - For using S3 API, you need to install `boto3` library using `pip install boto3` command
-
-## Blue Blueprints
-  * [conjur](conjur/)
-  * [Glass Fish](GlassFish)
-  * [PetPortalServiceNowExtended](PetPortalServiceNowExtended)
