@@ -53,7 +53,6 @@ xld:
   volumes:
    - ~/xl-licenses:/license
    - ~/keys:/keys
-   - ./initialize/Datical-2.0.0.dar:/opt/xebialabs/xl-deploy-server/importablePackages/Datical-2.0.0.dar
    - ./initialize/hammer:/opt/xebialabs/hammer
   links:
    - mysql1
@@ -72,7 +71,6 @@ xlr:
   image: xebialabsunsupported/docker-xlr:8.5.1
   volumes:
    - ~/xl-licenses:/license
-   - ./initialize/downloads/xlr-delphix-plugin-2.0.0-rc.6.jar:/opt/xebialabs/xl-release-server/default-plugins/__local__/xlr-delphix-plugin-2.0.0-rc.6.jar
   links:
    - jenkins
    - xld
@@ -82,7 +80,6 @@ xlr:
    - devregistry
    - qaregistry
    - ansible1
-   - delphix
   ports:
    - "5516:5516"
 
@@ -144,8 +141,6 @@ apache1:
 ansible1:
   image: xebialabsunsupported/docker-ansible-oc:latest
 
-delphix:
-  image: xebialabsunsupported/xl-docker-demo-delphix
 
 credentials:
   image: xebialabsunsupported/xl-docker-demo-xlr-credentials-updater:latest
