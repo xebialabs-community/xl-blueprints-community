@@ -1,37 +1,50 @@
 apiVersion: xl/v1
 kind: Blueprint
 metadata:
-  projectName: Docker Demo Application
+  projectName: Extended Jenkins Ansible Pipeline
   description: |
-    The blueprint deploys a simple application in 2 Docker containers into your local Docker setup.
-    XL Deploy does the deployment, while XL Release orchestrates everything.
+    This is a simple release tempalte that uses Ansible and Jenkins.
   author: XebiaLabs
   version: 1.0
 parameters:
-- name: AppName
-  type: Input
-  description: What is the Application name?
-- name: ContainerPort
-  type: Input
-  description: At what port should the application be exposed in the container?
-  default: 80
-- name: HostPort
-  type: Input
-  description: At what port should the container port be mapped in the host?
-  default: 8181
-- name: BackendDockerImage
-  type: Input
-  description: What is the Docker Image (repo and path) for the Backend service?
-  default: xebialabsunsupported/rest-o-rant-api
-- name: FrontendDockerImage
-  type: Input
-  description: What is the Docker Image (repo and path) for the Frontend service?
-  default: xebialabsunsupported/rest-o-rant-web
-
+  - name: FolderName
+    type: Input
+    description: What is the Folder name?
+  - name: AppName
+    type: Input
+    description: What is the Application name?
+  - name: ANSIBLE_HOSTNAME
+    type: Input
+    description: What is the Ansible Host name?
+  - name: ANSIBLE_PORT
+    type: Input
+    description: What is the Ansible Server Port?
+  - name: ANSIBLE_USERNAME
+    type: Input
+    description: What is the Ansible Host username?
+  - name: ANSIBLE_PASSWORD
+    type: Input
+    description: What is the Ansible Host password?
+  - name: JENKINS_URL
+    type: Input
+    description: What is the Jenkins URL?
+  - name: JENKINS_USERNAME
+    type: Input
+    description: What is the Jenkins username?
+  - name: JENKINS_PASSWORD
+    type: Input
+    description: What is the Jenkins password?
+  - name: DB_USERNAME
+    type: Input
+    description: What is the DB username?
+  - name: DB_PASSWORD
+    type: Input
+    description: What is the DB password?
 
 files:
 - path: xebialabs/xld-environment.yaml.tmpl
 - path: xebialabs/xld-infra.yaml.tmpl
 - path: xebialabs/xld-application.yaml.tmpl
+- path: xebialabs/xlr-configuration.yaml.tmpl
 - path: xebialabs/xlr-pipeline.yaml.tmpl
 - path: xebialabs.yaml
