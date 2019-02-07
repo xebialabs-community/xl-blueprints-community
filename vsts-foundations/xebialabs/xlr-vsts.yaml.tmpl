@@ -1,0 +1,194 @@
+---
+apiVersion: xl-release/v1
+kind: Templates
+spec:
+- name: Core
+  type: vsts.Server
+  url: {{.serverURL}}
+  authenticationMethod: Basic
+  username: {{.username}}
+  password: {{.token}}
+- template: VSTS-Foundations
+  scheduledStartDate: 2016-02-02T08:00:00Z
+  dueDate: 2019-02-07T02:52:40.347Z
+  phases:
+  - phase: DEV
+    tasks:
+    - name: Open change request
+      type: vsts.CreateWorkItem
+      tfsServer: Core
+      teamProjectName: ${teamProjectName}
+      workItemType: Task
+      workItemTitle: XLR VSTS Release Orchestration
+      variableMapping:
+        pythonScript.workItemId: ${workItemId}
+    - name: Build package
+      type: vsts.QueueBuild
+      tfsServer: Core
+      teamProjectName: ${teamProjectName}
+      buildDefinitionName: ${buildDefinitionName}
+      variableMapping:
+        pythonScript.buildNumber: ${buildNumber}
+        pythonScript.buildResult: ${buildResult}
+    - name: Initiate pipeline
+      type: vsts.CreateRelease
+      tfsServer: Core
+      teamProjectName: ${teamProjectName}
+      releaseDefinitionName: ${releaseDefinitionName}
+      variableMapping:
+        pythonScript.releaseId: ${releaseId}
+    - name: Deploy to DEV
+      type: vsts.StartDeploymentInRelease
+      tfsServer: Core
+      teamProjectName: ${teamProjectName}
+      environmentName: ${devEnvironmentName}
+      variableMapping:
+        pythonScript.releaseId: ${releaseId}
+    - name: Wait for DEV deployment
+      type: vsts.WaitForRelease
+      tfsServer: Core
+      teamProjectName: ${teamProjectName}
+      environmentName: ${devEnvironmentName}
+      fail: true
+      seconds: "5"
+      variableMapping:
+        pythonScript.releaseId: ${releaseId}
+    - name: Add comment to change request
+      type: vsts.UpdateWorkItem
+      tfsServer: Core
+      workItemId: ${workItemId}
+      state: Active
+      comment: ${buildNumber} available on DEV.  Close work item upon verification/approval.
+    color: '#FD8D10'
+  - phase: TEST
+    tasks:
+    - name: Wait for approval for deployment to test
+      type: vsts.WaitForWorkItemState
+      tfsServer: Core
+      workItemId: ${workItemId}
+      requiredState: Closed
+      seconds: "5"
+    - name: Deploy to TEST
+      type: vsts.StartDeploymentInRelease
+      tfsServer: Core
+      teamProjectName: ${teamProjectName}
+      environmentName: ${testEnvironmentName}
+      variableMapping:
+        pythonScript.releaseId: ${releaseId}
+    - name: Wait for TEST deployment
+      type: vsts.WaitForRelease
+      tfsServer: Core
+      teamProjectName: ${teamProjectName}
+      environmentName: ${testEnvironmentName}
+      fail: true
+      seconds: "5"
+      variableMapping:
+        pythonScript.releaseId: ${releaseId}
+    - name: Add comment to change request
+      type: vsts.UpdateWorkItem
+      tfsServer: Core
+      workItemId: ${workItemId}
+      state: Active
+      comment: ${buildNumber} available on TEST.  Close work item upon verification/approval.
+    color: '#009CDB'
+  - phase: PROD
+    tasks:
+    - name: Wait for approval for deployment to prod
+      type: vsts.WaitForWorkItemState
+      tfsServer: Core
+      workItemId: ${workItemId}
+      requiredState: Closed
+      seconds: "5"
+    - name: Deploy to PROD
+      type: vsts.StartDeploymentInRelease
+      tfsServer: Core
+      teamProjectName: ${teamProjectName}
+      environmentName: ${prodEnvironmentName}
+      variableMapping:
+        pythonScript.releaseId: ${releaseId}
+    - name: Wait for PROD deployment
+      type: vsts.WaitForRelease
+      tfsServer: Core
+      teamProjectName: ${teamProjectName}
+      environmentName: ${prodEnvironmentName}
+      fail: true
+      seconds: "5"
+      variableMapping:
+        pythonScript.releaseId: ${releaseId}
+    - name: Verify PROD deployment
+      type: xlrelease.GateTask
+      owner: admin
+      conditions:
+      - name: Smoke Tests Successful
+        type: xlrelease.GateCondition
+      - name: Test Transaction Successful
+        type: xlrelease.GateCondition
+    - name: Add comment to change request
+      type: vsts.UpdateWorkItem
+      tfsServer: Core
+      workItemId: ${workItemId}
+      comment: ${buildNumber} available on PROD
+    color: '#08B153'
+  variables:
+  - type: xlrelease.StringVariable
+    key: buildNumber
+    requiresValue: false
+    showOnReleaseStart: false
+  - type: xlrelease.StringVariable
+    key: teamProjectName
+    label: Team Project Name
+  - type: xlrelease.StringVariable
+    key: workItemId
+    requiresValue: false
+    showOnReleaseStart: false
+  - type: xlrelease.StringVariable
+    key: buildDefinitionName
+    label: Build Definition Name
+  - type: xlrelease.StringVariable
+    key: buildResult
+    requiresValue: false
+    showOnReleaseStart: false
+  - type: xlrelease.IntegerVariable
+    key: releaseId
+    requiresValue: false
+    showOnReleaseStart: false
+  - type: xlrelease.StringVariable
+    key: releaseDefinitionName
+    label: Release Definition Name
+  - type: xlrelease.StringVariable
+    key: devEnvironmentName
+    label: DEV Environment Name
+  - type: xlrelease.StringVariable
+    key: testEnvironmentName
+    label: TEST Environment Name
+  - type: xlrelease.StringVariable
+    key: prodEnvironmentName
+    label: PROD Environment Name
+- type: xlrelease.Dashboard
+  owner: admin
+  tiles:
+  - name: Release progress
+    type: xlrelease.ReleaseProgressTile
+    row: 1
+    col: 0
+  - name: Release health
+    type: xlrelease.ReleaseHealthTile
+    row: 2
+  - name: Release summary
+    type: xlrelease.ReleaseSummaryTile
+  - name: Resource usage
+    type: xlrelease.ResourceUsageTile
+  - name: Release timeline
+    type: xlrelease.TimelineTile
+    row: 3
+  - name: XLR VSTS Release Orchestration
+    type: xlrelease.MarkdownTile
+    row: 0
+    col: 1
+    content: |-
+      # XLR VSTS Release Orchestration
+
+      > This tile can be edited
+
+      This template was generated through the `vsts-foundations` blueprint and includes automated interaction with VSTS work items, builds, and releases
+  parentTemplate: VSTS-Foundations

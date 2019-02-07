@@ -1,5 +1,6 @@
 [
   "conjur/xld",
   "PetPortalServiceNowExtended",
-  "GlassFish"
+  "GlassFish",
+  "vsts-foundations"
 ]

@@ -1,0 +1,22 @@
+apiVersion: xl/v1
+kind: Blueprint
+metadata:
+  projectName: VSTS
+  description: |
+    A blueprint to orchestrate VSTS builds, deployments, and work item operations in VSTS.
+  author: XebiaLabs
+  version: 1.0
+parameters:
+- name: serverURL
+  type: Input
+  description: What is the VSTS server URL (this should take the form of https://example.visualstudio.com)?
+- name: username
+  type: Input
+  description: What is the VSTS username?
+- name: token
+  type: Input
+  description: What is the VSTS API token?
+  secret: true
+
+files:
+- path: xebialabs/xlr-vsts.yaml.tmpl
