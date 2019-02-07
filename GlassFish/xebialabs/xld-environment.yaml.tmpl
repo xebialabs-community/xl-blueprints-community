@@ -1,0 +1,30 @@
+---
+apiVersion: xl-deploy/v1
+kind: Environments
+spec:
+- directory: Environments/glassfish
+
+---
+apiVersion: xl-deploy/v1
+kind: Environments
+spec:
+- name: Environments/glassfish/DEVglassfish
+  type: udm.Environment
+  members:
+  - Infrastructure/glassfish/{{.gfHost}}/domain1
+  - Infrastructure/glassfish/{{.gfHost}}/domain1/server
+  dictionaries:
+  - Environments/glassfish/{{.AppName}}-Dict-DEVglassfish
+- name: Environments/glassfish/{{.AppName}}-Dict-DEVglassfish
+  type: udm.Dictionary
+  entries:
+    PETPORTAL_TITLE: The Pet Portal (C) Site
+    DB_USERNAME: !value DB_USERNAME
+    DB_PASSWORD: !value DB_PASSWORD
+    APACHE_HOST: apache1
+    APPSERVER_PORT: "{{.APPSERVER_PORT}}"
+    PETCLINIC_CONTEXT_ROOT: {{.PETCLINIC_CONTEXT_ROOT}}
+    APACHE_PORT: "80"
+    DB_DRIVER: mysql-connector-java-5.1.40-bin.jar_com.mysql.jdbc.Driver_5_1
+    DB_URL: jdbc:mysql:@localhost:mysql
+    APPSERVER_HOST: {{.gfHost}}

@@ -1,0 +1,266 @@
+{{$app := .AppName | kebabcase}}
+---
+apiVersion: xl-release/v1
+kind: Templates
+spec:
+- directory: {{.FolderName}}
+  children:
+  - template: {{.AppName}}
+    scheduledStartDate: 2016-02-02T08:00:00Z
+    phases:
+    - phase: Dev
+      tasks:
+      - name: Build package
+        type: jenkins.Build
+        jenkinsServer: Jenkins
+        jobName: PetPortal
+        variableMapping:
+          pythonScript.buildNumber: ${buildNumber}
+      - name: Deploy to TEST
+        type: xldeploy.Deploy
+        server: XLD Server
+        deploymentPackage: PetPortal/2.1-${buildNumber}
+        deploymentEnvironment: Dev/DEV
+      - name: Auto Testing
+        type: qtp.RunTest
+        precondition: |-
+          import time
+          time.sleep(5)
+          result=False
+      color: '#009CDB'
+    - phase: Test
+      tasks:
+      - name: Open Service Request
+        type: servicenow.CreateServiceRequest
+        servicenowServer: SNOW
+        shortDescription: Deploy Package to TEST
+        ^comments: |-
+          Deploy  PetPortal/2.1-${buildNumber}  to TEST
+        variableMapping:
+          pythonScript.Ticket: ${serviceRequestTicket}
+          pythonScript.sysId: ${serviceRequestId}
+        watchers:
+        - admin
+      - name: Add Tag
+        type: xlr.AddTag
+        newTag: ${serviceRequestTicket}
+      - name: Deploy to TEST
+        type: xldeploy.Deploy
+        server: XLD Server
+        deploymentPackage: PetPortal/2.1-${buildNumber}
+        deploymentEnvironment: Dev/DEV
+      - name: Update Service Request
+        type: servicenow.UpdateServiceRequest
+        servicenowServer: SNOW
+        sysId: ${serviceRequestId}
+        content: |-
+          {
+          "work_notes":"PetPortal/2.1-${buildNumber} available on TEST"
+          }
+      - name: Perform Automated Testing
+        type: xlrelease.ParallelGroup
+        tasks:
+        - name: Smoke Testing
+          type: xlrelease.ScriptTask
+          owner: admin
+          plannedDuration: 1800
+          script: |-
+            import time
+            time.sleep(5)
+            print "Performing Smoke Tests"
+        - name: Load Testing
+          type: xlrelease.ScriptTask
+          owner: admin
+          plannedDuration: 3600
+          script: |-
+            import time
+            time.sleep(10)
+            print "Performing  Load Tests"
+      - name: Close Service Request
+        type: servicenow.UpdateServiceRequest
+        servicenowServer: SNOW
+        sysId: ${serviceRequestId}
+        content: |-
+          {
+          "stage":"Closed Complete",
+          "work_notes":"PetPortal/2.1-${buildNumber} available on TEST"
+          }
+      - name: SNow Change Request
+        type: xlrelease.SequentialGroup
+        tasks:
+        - name: Open Change Request
+          type: servicenow.CreateRequest
+          servicenowServer: SNOW
+          shortDescription: PetPortal Demo
+          ^comments: |-
+            PetPortal Demo
+          variableMapping:
+            pythonScript.Ticket: ${changeRequestId}
+            pythonScript.sysId: ${changeRequestSysId}
+          watchers:
+          - admin
+        - name: Add Assignment Group
+          type: servicenow.UpdateChangeRequest
+          servicenowServer: SNOW
+          sysId: ${changeRequestSysId}
+          content: |-
+            {
+            "assignment_group":"Network",
+            "state":"Assess",
+            "work_notes":"Requesting permission to deploy PetPortal/2.1-${buildNumber} deployed to PROD "
+            }
+        - name: Service Request Complete Change Control Stated
+          type: xlrelease.NotificationTask
+          addresses:
+          - rbroker@xebialabs.com
+          subject: Service Request Complete Change Control Stated
+          body: |-
+            Tickets:
+            * Service Request: ${serviceRequestTicket}
+            * Change Request: ${changeRequestId}
+          replyTo: xlrelease@xebialabs.com
+        - name: Change Change Ticket Tag
+          type: xlr.AddTag
+          newTag: ${changeRequestId}
+      color: '#009CDB'
+    - phase: PROD
+      tasks:
+      - name: Wait for approval for deployment to prod
+        type: servicenow.PollingCheckStatus
+        servicenowServer: SNOW
+        sysId: ${changeRequestSysId}
+        pollInterval: 10
+        statusField: approval
+        checkForStatus: Approved
+        plannedDuration: 432060
+        variableMapping:
+          pythonScript.status: ${changeRequestStatus}
+      - name: Start Implementation In Production
+        type: servicenow.UpdateChangeRequest
+        servicenowServer: SNOW
+        sysId: ${changeRequestSysId}
+        content: |-
+          {
+          "state":"Implement",
+          "work_notes":"PetPortal/2.1-${buildNumber} deploying on PROD"
+          }
+      - name: Deploy to PROD
+        type: xldeploy.Deploy
+        server: XLD Server
+        deploymentPackage: PetPortal/2.1-${buildNumber}
+        deploymentEnvironment: Dev/DEV
+      - name: Implemented In Production
+        type: servicenow.UpdateChangeRequest
+        servicenowServer: SNOW
+        sysId: ${changeRequestSysId}
+        content: |-
+          {
+          "work_notes":"PetPortal/2.1-${buildNumber} deployed on PROD waiting for manual confirmation"
+          }
+      - name: Verify PROD Deployment
+        type: xlrelease.GateTask
+        owner: admin
+        plannedDuration: 7200
+        conditions:
+        - name: Smoke Tests Successful
+          type: xlrelease.GateCondition
+        - name: Test Transaction Successful
+          type: xlrelease.GateCondition
+      - name: Add comment to change request
+        type: servicenow.UpdateRecord
+        servicenowServer: SNOW
+        sysId: ${changeRequestSysId}
+        content: |-
+          {
+          "state":"Review",
+          "work_notes":"PetPortal/2.1-${buildNumber} available on PROD"
+          }
+      - name: Close Change Request
+        type: servicenow.UpdateRecord
+        servicenowServer: SNOW
+        sysId: ${changeRequestSysId}
+        content: |-
+          {
+          "state":"Closed",
+          "close_code":"Successful",
+          "close_notes":"Deployment Complete"
+          }
+      - name: Release Complete In Production
+        type: xlrelease.NotificationTask
+        addresses:
+        - rbroker@xebialabs.com
+        subject: Release Complete In Production
+        body: |-
+          Tickets:
+          * Service Request: ${serviceRequestTicket}
+          * Change Request: ${changeRequestId}
+        replyTo: xlrelease@xebialabs.com
+      color: '#009CDB'
+    tags:
+    - snow
+    variables:
+    - type: xlrelease.StringVariable
+      key: buildNumber
+      requiresValue: false
+      showOnReleaseStart: false
+    - type: xlrelease.StringVariable
+      key: ticket
+      requiresValue: false
+      showOnReleaseStart: false
+    - type: xlrelease.StringVariable
+      key: changeRequestId
+      requiresValue: false
+      showOnReleaseStart: false
+    - type: xlrelease.StringVariable
+      key: changeRequestSysId
+      requiresValue: false
+      showOnReleaseStart: false
+    - type: xlrelease.StringVariable
+      key: changeRequestStatus
+      requiresValue: false
+      showOnReleaseStart: false
+    - type: xlrelease.StringVariable
+      key: serviceRequestId
+      requiresValue: false
+      showOnReleaseStart: false
+    - type: xlrelease.StringVariable
+      key: serviceRequestTicket
+      requiresValue: false
+      showOnReleaseStart: false
+    scriptUsername: admin
+    scriptUserPassword: admin
+  - type: xlrelease.Dashboard
+    owner: admin
+    tiles:
+    - name: Release progress
+      type: xlrelease.ReleaseProgressTile
+    - name: Release health
+      type: xlrelease.ReleaseHealthTile
+    - name: Release summary
+      type: xlrelease.ReleaseSummaryTile
+    - name: Resource usage
+      type: xlrelease.ResourceUsageTile
+      width: 1
+      row: 1
+    - name: Release timeline
+      type: xlrelease.TimelineTile
+      row: 2
+    - name: ServiceNow tickets
+      type: servicenow.ServiceNowQueryTile
+      row: 1
+      col: 2
+      servicenowServer: SNOW
+      tableName: change_request
+      detailsViewColumns:
+        number: number
+        short_description: short_description
+        state: state
+        priority: priority
+        assigned_to: assigned_to.display_value
+    - name: JIRA issues
+      type: jira.JiraQueryTile
+      row: 1
+      col: 1
+      jiraServer: XebiaLabs JIRA
+      query: type=task&project=SAN
+    parentTemplate: {{.AppName}}

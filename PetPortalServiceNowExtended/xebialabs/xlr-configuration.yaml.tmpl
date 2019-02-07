@@ -1,0 +1,20 @@
+apiVersion: xl-release/v1
+kind: Templates
+spec:
+- name: XLD Server
+  type: xldeploy.XLDeployServer
+  url: http://xld:4516
+  username: !value XL_DEPLOY_USERNAME
+  password: !value XL_DEPLOY_PASSWORD
+
+- name: SNOW
+  type: servicenow.Server
+  url: {{.SNOW_URL}}
+  username: !value SNOW_USERNAME
+  password: !value SNOW_PASSWORD
+
+- name: XebiaLabs JIRA
+  type: jira.Server
+  url: {{.JIRA_URL}}
+  username: !value JIRA_USERNAME
+  password: !value JIRA_PASSWORD

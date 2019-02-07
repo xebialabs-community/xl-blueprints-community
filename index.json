@@ -1,3 +1,5 @@
 [
-  "conjur/xld"
+  "conjur/xld",
+  "PetPortalServiceNowExtended",
+  "GlassFish"
 ]

@@ -1,0 +1,6 @@
+web:
+  image: httpd
+  volumes:
+   - ./:/usr/local/apache2/htdocs/
+  ports:
+   - "3516:80"

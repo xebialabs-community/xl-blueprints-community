@@ -1,0 +1,27 @@
+---
+apiVersion: xl-deploy/v1
+kind: Infrastructure
+spec:
+- directory: Infrastructure/glassfish
+
+---
+apiVersion: xl-deploy/v1
+kind: Infrastructure
+spec:
+- name: Infrastructure/glassfish/{{.gfHost}}
+  type: overthere.SshHost
+  os: UNIX
+  connectionType: SCP
+  address: {{.gfHost}}
+  username: !value gfHost_USERNAME
+  password: !value gfHost_PASSWORD
+  children:
+  - name: domain1
+    type: glassfish.Domain
+    home: /opt/glassfish/glassfish
+    username: admin
+    servers:
+    - name: server
+      type: glassfish.StandaloneServer
+      disableInLoadBalancer: false
+      host: Infrastructure/glassfish/{{.gfHost}}
