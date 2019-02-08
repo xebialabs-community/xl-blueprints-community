@@ -1,0 +1,133 @@
+---
+apiVersion: xl-release/v1
+kind: Templates
+spec:
+- directory: {{.folderName}}
+  children:
+    - template: PetPortal-JenkinsAnsible
+      scheduledStartDate: 2019-01-30T14:00:00Z
+      phases:
+      - phase: Environment Build
+        tasks:
+        - name: Create App Database
+          type: ansible.RunPlaybook
+          host: {{.ansibleHost}}
+          playbookPath: /root/install-mysql.yaml
+          cmdParams: -i ahosts
+        - name: Install Tomcat MW
+          type: ansible.RunPlaybook
+          host: {{.ansibleHost}}
+          playbookPath: /root/install-tomcat.yaml
+          cmdParams: -i ahosts
+        - name: Setup Automated Tests
+          type: webhook.XmlWebhook
+          URL: http://jenkins:8080//createItem?name=RunTests
+          method: POST
+          body: |-
+            <?xml version='1.1' encoding='UTF-8'?>
+            <project>
+              <description></description>
+              <keepDependencies>false</keepDependencies>
+              <properties/>
+              <scm class="hudson.scm.NullSCM"/>
+              <canRoam>true</canRoam>
+              <disabled>false</disabled>
+              <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+              <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+              <triggers/>
+              <concurrentBuild>false</concurrentBuild>
+              <builders>
+                <hudson.tasks.Shell>
+                  <command>echo &quot;Starting Tests...&quot;
+            sleep 15
+            echo &quot;Tests Successful!&quot;</command>
+                </hudson.tasks.Shell>
+              </builders>
+              <publishers/>
+              <buildWrappers/>
+            </project>
+      - phase: Deployment
+        tasks:
+        - name: Build Appication
+          type: jenkins.Build
+          jenkinsServer: {{.jenkinsServer}}
+          jobName: ${appname}
+          variableMapping:
+            pythonScript.buildNumber: ${buildNumber}
+        - name: Run Unit Tests
+          type: jenkins.Build
+          jenkinsServer: {{.jenkinsServer}}
+          jobName: RunTests
+        - name: Deployment
+          type: xlrelease.ParallelGroup
+          tasks:
+          - name: Ansible
+            type: ansible.RunPlaybook
+            host: {{.ansibleHost}}
+            playbookPath: /root/perform-deployment.yaml
+            cmdParams: -i ahosts
+          - name: App Deploy
+            type: xldeploy.Deploy
+            server: XebiaLabs Internal
+            deploymentPackage: ${appname}/2.1-${buildNumber}
+            deploymentEnvironment: Dev/TEST
+        - name: Send Notification to Testing Team
+          type: xlrelease.NotificationTask
+          precondition: 0 == 1
+          subject: Deployed application ${appname}/1.0.${buildNumber}
+          body: Deployed Application ${appname}/1.0.${buildNumber} to TEST Environment
+          priority: High
+        - name: Perform Smoke Tests
+          type: xlrelease.GateTask
+          owner: admin
+          conditions:
+          - name: Web Smoke tests successful
+            type: xlrelease.GateCondition
+          - name: Backend Smoke tests successful
+            type: xlrelease.GateCondition
+        color: '#08B153'
+      - phase: Testing
+        tasks:
+        - name: Jenkins Run Functional Tests
+          type: jenkins.Build
+          jenkinsServer: {{.jenkinsServer}}
+          jobName: RunTests
+        - name: Run Automated Tests
+          type: xlrelease.ParallelGroup
+          tasks:
+          - name: Perform Performance Testing
+            type: xlrelease.ScriptTask
+            script: "import time \ntime.sleep(10)\nprint \"Performance Tests Successful...\""
+          - name: Perform Regression Testing
+            type: xlrelease.ScriptTask
+            script: "import time \ntime.sleep(20)\nprint \"Performance Tests Successful...\""
+        - name: Verify Security Scans
+          type: xlrelease.GateTask
+          owner: admin
+          conditions:
+          - name: Check Black Duck Scans
+            type: xlrelease.GateCondition
+          - name: Check Fortify Scans
+            type: xlrelease.GateCondition
+        color: '#FD8D10'
+      variables:
+      - type: xlrelease.StringVariable
+        key: appname
+        value: PetPortal
+      - type: xlrelease.StringVariable
+        key: buildNumber
+        requiresValue: false
+        showOnReleaseStart: false
+    - type: xlrelease.Dashboard
+      tiles:
+      - name: Release progress
+        type: xlrelease.ReleaseProgressTile
+      - name: Release summary
+        type: xlrelease.ReleaseSummaryTile
+      - name: Resource usage
+        type: xlrelease.ResourceUsageTile
+      - name: Release timeline
+        type: xlrelease.TimelineTile
+      - name: Release health
+        type: xlrelease.ReleaseHealthTile
+      parentTemplate: PetPortal-JenkinsAnsible

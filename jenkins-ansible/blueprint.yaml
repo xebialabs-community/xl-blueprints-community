@@ -1,0 +1,21 @@
+apiVersion: xl/v1
+kind: Blueprint
+metadata:
+  projectName: Extended Jenkins Ansible Pipeline
+  description: |
+    This is a simple release tempalte that uses Ansible and Jenkins.
+  author: XebiaLabs
+  version: 1.0
+parameters:
+  - name: folderName
+    type: Input
+    description: What is the XL Release folder name?
+  - name: ansibleHost
+    type: Input
+    description: What is the Ansible Host name?
+  - name: jenkinsServer
+    type: Input
+    description: What is the Jenkins server name?
+
+files:
+- path: xebialabs/xlr-pipeline.yaml.tmpl
