@@ -9,7 +9,7 @@ services:
     - ACCEPT_EULA=Y
     volumes:
     - ../:/project:ro
-    - /Users/lynn/.ssh/MH-AWS-Administrator.pem:/Users/lynn/.ssh/MH-AWS-Administrator.pem
+    - {{.KeyFilePath}}{{.KeyFileName}}.pem:{{.KeyFilePath}}{{.KeyFileName}}.pem
   xl-release:
     image: xebialabs/xl-release:9.5
     ports:
@@ -27,13 +27,5 @@ services:
     command: ["apply", "--xl-deploy-url", "http://xl-deploy:4516/", "--xl-release-url", "http://xl-release:5516/", "-f", "/data/configure-xl-devops-platform.yaml"]
     volumes:
     - ./data/:/data:ro
-  
-#  xl-cli:
-#   image: xebialabsunsupported/xl-cli:9.0
-#    depends_on:
-#    - xl-deploy
-#    - xl-release
-#    command: ["apply", "--xl-deploy-url", "http://xl-deploy:4516/", "--xl-release-url", "http://xl-release:5516/", "-f", "/project/xebialabs.yaml"]
-#    volumes:
-#    - ../:/project:ro
+
   

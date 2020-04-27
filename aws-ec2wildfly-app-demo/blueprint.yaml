@@ -62,4 +62,4 @@ spec:
   - path: xebialabs/xlr-pipeline.yaml.tmpl
   - path: xebialabs/artifacts/Applications/PetClinic-ear/2.0/PetClinic/PetClinic-2.0.ear
   - path: docker/data/configure-xl-devops-platform.yaml
-  - path: docker/docker-compose.yml
+  - path: docker/docker-compose.yml.tmpl
