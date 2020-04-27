@@ -1,0 +1,39 @@
+version: '3.7'
+services:
+  xl-deploy:
+    image: xebialabs/xl-deploy:9.5
+    ports:
+    - "14516:4516"
+    environment:
+    - ADMIN_PASSWORD=admin
+    - ACCEPT_EULA=Y
+    volumes:
+    - ../:/project:ro
+    - /Users/lynn/.ssh/MH-AWS-Administrator.pem:/Users/lynn/.ssh/MH-AWS-Administrator.pem
+  xl-release:
+    image: xebialabs/xl-release:9.5
+    ports:
+    - "15516:5516"
+    environment:
+    - ADMIN_PASSWORD=admin
+    - ACCEPT_EULA=Y
+    volumes:
+    - ../:/project:ro
+  xl-cli:
+    image: xebialabsunsupported/xl-cli:9.0
+    depends_on:
+    - xl-deploy
+    - xl-release
+    command: ["apply", "--xl-deploy-url", "http://xl-deploy:4516/", "--xl-release-url", "http://xl-release:5516/", "-f", "/data/configure-xl-devops-platform.yaml"]
+    volumes:
+    - ./data/:/data:ro
+  
+#  xl-cli:
+#   image: xebialabsunsupported/xl-cli:9.0
+#    depends_on:
+#    - xl-deploy
+#    - xl-release
+#    command: ["apply", "--xl-deploy-url", "http://xl-deploy:4516/", "--xl-release-url", "http://xl-release:5516/", "-f", "/project/xebialabs.yaml"]
+#    volumes:
+#    - ../:/project:ro
+  

@@ -1,0 +1,12 @@
+---
+apiVersion: xl-deploy/v1
+kind: Infrastructure
+spec:
+- name: Infrastructure/AWS-EC2
+  type: aws.Cloud
+  accesskey: {{.AWSAccessKey}}
+  accessSecret: {{.AWSAccessSecret}}
+  useCredentials: true
+  verifySSL: false
+  idpVerifySSL: true
+- directory: Infrastructure/JBoss

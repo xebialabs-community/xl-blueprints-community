@@ -1,0 +1,77 @@
+---
+apiVersion: xl-release/v1
+kind: Templates
+spec:
+- template: Deploy Pet Clinic to AWS
+  scheduledStartDate: 2020-04-21T16:00:00Z
+  phases:
+  - phase: Deploy
+    tasks:
+    - name: Deploy Provisioning Package to AWS
+      type: xldeploy.Deploy
+      server: XL Deploy
+      username: !value XL_DEPLOY_USERNAME
+      password: !value XL_DEPLOY_PASSWORD
+      deploymentApplication: Applications/PetClinicEnv
+      deploymentVersion: 1.0.0
+      deploymentPackage: Applications/PetClinicEnv/1.0.0
+      deploymentEnvironment: Environments/Cloud
+      variableMapping:
+        pythonScript.xlDeployTaskId: ${deploymentId}
+    - name: Deploy Pet Clinic Application
+      type: xldeploy.Deploy
+      server: XL Deploy
+      deploymentApplication: Applications/PetClinic-ear
+      deploymentVersion: "2.0"
+      deploymentPackage: Applications/PetClinic-ear/2.0
+      deploymentEnvironment: Environments/Cloud
+    - name: Get Public Hostname
+      type: xld.GetCITask
+      server: XL Deploy
+      ciID: Infrastructure/AWS-EC2/jboss-instance-spec
+      accept: json
+      variableMapping:
+        pythonScript.response: ${DeploymentOutput}
+    - name: Create Test URL
+      type: xlrelease.ScriptTask
+      script: |-
+        import json
+
+        releaseVariables['TestURL'] = ("http://%s/petclinic" % json.loads(releaseVariables['DeploymentOutput'])['publicHostname'])
+    color: '#0079BC'
+  - phase: Test
+    tasks:
+    - name: Test URL
+      type: xlrelease.Task
+      description: |-
+        Test for successful deployment by viewing the following URL in a new browser window:
+        ${TestURL}.
+        Then assign the task to yourself and set the task to Complete. The release will then automatically proceed to undeploy the application and provisioning package from AWS.
+    color: '#0079BC'
+  - phase: Undeploy
+    tasks:
+    - name: Undeploy Pet Clinic Application
+      type: xldeploy.Undeploy
+      server: XL Deploy
+      deployedApplication: Environments/Cloud/PetClinic-ear
+    - name: Undeploy AWS Provisioning Package
+      type: xldeploy.Undeploy
+      server: XL Deploy
+      deployedApplication: Environments/Cloud/PetClinicEnv
+    color: '#0079BC'
+  variables:
+  - type: xlrelease.StringVariable
+    key: deploymentId
+    requiresValue: false
+    showOnReleaseStart: false
+  - type: xlrelease.StringVariable
+    key: DeploymentOutput
+    requiresValue: false
+    showOnReleaseStart: false
+  - type: xlrelease.StringVariable
+    key: TestURL
+    requiresValue: false
+    showOnReleaseStart: false
+  scriptUsername: !value XL_RELEASE_USERNAME
+  scriptUserPassword: !value XL_RELEASE_PASSWORD
+  riskProfile: Default risk profile

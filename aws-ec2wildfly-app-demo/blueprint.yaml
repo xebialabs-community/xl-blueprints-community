@@ -1,0 +1,65 @@
+apiVersion: xl/v2
+kind: Blueprint
+
+metadata:
+  name: aws-ec2wildfly-app-demo
+  description: |
+    Starts wildfly AMI EC2 instance in AWS and then deploys a simple application to it
+  author: XebiaLabs
+  version: 2.0
+  instructions: Will add more later
+
+spec:
+  parameters:
+  - name: UseAWSCredentialsFromSystem
+    type: Confirm
+    prompt: Do you want to use AWS credentials from ~/.aws/credentials file?
+    promptIf: !expr "awsCredentials('IsAvailable')"
+
+  - name: AWSAccessKey
+    type: SecretInput
+    prompt: What is the AWS Access Key ID?
+    promptIf: !expr "!UseAWSCredentialsFromSystem"
+    default: !expr "awsCredentials('AccessKeyID')"
+
+  - name: AWSAccessSecret
+    type: SecretInput
+    prompt: What is the AWS Secret Access Key?
+    promptIf: !expr "!UseAWSCredentialsFromSystem"
+    default: !expr "awsCredentials('SecretAccessKey')"
+
+  - name: AWSRegion
+    type: Select
+    prompt: "Select the AWS region:"
+    saveInXlvals: true
+    default: !expr "awsRegions('ecs', 0)"
+    options:
+    - !expr "awsRegions('ecs')"
+
+  - name: AWSSecurityGroup
+    type: Input
+    prompt: "Provide the id of a security group in your AWS account that has necessary open ports"
+
+  - name: AmiId
+    type: Input
+    prompt: What is the Id of the AMI?
+    default: ami-08774d91adb972d1d
+
+  - name: KeyFileName
+    type: Input
+    prompt: "What is the name of your AWS key file? Note - do not include the .pem extension"
+
+  - name: KeyFilePath
+    type: Input
+    prompt: "Provide the directory path where your AWS key file is located, for example: /Users/yourUserName/.ssh/"
+
+  files:
+  - path: xebialabs.yaml
+  - path: xebialabs/USAGE.md.tmpl
+  - path: xebialabs/xld-apps.yaml.tmpl
+  - path: xebialabs/xld-env.yaml.tmpl
+  - path: xebialabs/xld-infra.yaml.tmpl
+  - path: xebialabs/xlr-pipeline.yaml.tmpl
+  - path: xebialabs/artifacts/Applications/PetClinic-ear/2.0/PetClinic/PetClinic-2.0.ear
+  - path: docker/data/configure-xl-devops-platform.yaml
+  - path: docker/docker-compose.yml

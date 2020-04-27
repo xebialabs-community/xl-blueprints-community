@@ -1,0 +1,5 @@
+AppName: MyApp
+SomeCondition: true
+Username: admin
+Password: admin
+MultiSelect: simple-value

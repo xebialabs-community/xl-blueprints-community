@@ -1,0 +1,9 @@
+---
+apiVersion: xl-deploy/v1
+kind: Environments
+spec:
+- name: Environments/Cloud
+  type: udm.Environment
+  members:
+  - Infrastructure/AWS-EC2
+  directoryPath: JBoss

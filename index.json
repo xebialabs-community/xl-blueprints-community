@@ -3,5 +3,6 @@
   "conjur/xld",
   "PetPortalServiceNowExtended",
   "GlassFish",
-  "vsts-foundations"
+  "vsts-foundations",
+  "aws-ec2wildfly-app-demo"
 ]

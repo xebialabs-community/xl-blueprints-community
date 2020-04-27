@@ -1,0 +1,8 @@
+answers-file: answers.yaml
+expected-files:
+- xebialabs.yaml
+- xebialabs/USAGE.md
+- xebialabs/xld-apps.yaml
+- xebialabs/xld-infra-env.yaml
+- xebialabs/xlr-pipeline-ci-cd.yaml
+- xebialabs/xlr-pipeline-destroy.yaml
