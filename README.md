@@ -51,3 +51,4 @@ Run `publish.py` script to update the S3 bucket for development availabvle at [h
   * [conjur](conjur/)
   * [Glass Fish](GlassFish)
   * [PetPortalServiceNowExtended](PetPortalServiceNowExtended)
+  * [aws-ec2wildfly-app-demo](ws-ec2wildfly-app-demo)

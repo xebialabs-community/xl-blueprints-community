@@ -38,7 +38,7 @@ spec:
 
   - name: AWSSecurityGroup
     type: Input
-    prompt: "Provide the id of a security group in your AWS account that has necessary open ports"
+    prompt: "Provide the id of a security group in your AWS account that has necessary open ports:"
 
   - name: AmiId
     type: Input
@@ -47,11 +47,11 @@ spec:
 
   - name: KeyFileName
     type: Input
-    prompt: "What is the name of your AWS key file? Note - do not include the .pem extension"
+    prompt: "What is the name of your AWS key file? Note: do not include the .pem extension."
 
   - name: KeyFilePath
     type: Input
-    prompt: "Provide the directory path where your AWS key file is located, for example: /Users/yourUserName/.ssh/"
+    prompt: "Provide the directory path where your AWS key file is located, for example: /Users/yourUserName/.ssh/  Note: include the ending / character."
 
   files:
   - path: xebialabs.yaml
