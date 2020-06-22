@@ -21,7 +21,12 @@ You will need to install the [XebiaLabs XL CLI tool](https://docs.xebialabs.com/
 
 ### Docker Prerequisites
 
-The XebiaLabs Dev Ops Platform - XL Release and XL Deploy - can be run in Docker containers using the docker-compose file included in this project. You will need to have [Docker Desktop](https://www.docker.com/products/docker-desktop) installed.
+The XebiaLabs Dev Ops Platform - XL Release and XL Deploy - can be run in Docker containers using the docker-compose file included in this project. You will need to have the following installed locallys:
+
+* [Docker](https://docs.docker.com/install/)
+* [Docker Compose](https://docs.docker.com/compose/install/)
+
+If you're running Docker for Desktop for macOS or Windows, Docker Compose is already included in your installation.
 
 ### AWS Prerequisites
 
@@ -108,7 +113,7 @@ xl-release:
 docker-compose up
 ```
 
-* When XL Release and XL Docker have finished starting up, you can log into both of them using the credentials admin/admin. XL Release is accessible at this url: http://localhost:15516 and XL Deploy at: http://localhost:14516. You should see that XL Release has already be configured with a shared configuration connecting it to the XL Deploy instance running in Docker.
+* When XL Release and XL Docker have finished starting up, you can log into both of them using the credentials admin/admin. XL Release is accessible at this url: http://localhost:15516 and XL Deploy at: http://localhost:14516. You should see that XL Release has already been configured with a shared configuration connecting it to the XL Deploy instance running in Docker.
   
 * You can now apply the newly configured blueprint to XL Release and XL Deploy by opening a terminal, cd into your blueprint directory, then run
 
