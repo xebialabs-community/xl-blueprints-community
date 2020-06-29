@@ -4,8 +4,8 @@ kind: Infrastructure
 spec:
 - name: Infrastructure/AWS-EC2
   type: aws.Cloud
-  accesskey: {{.AWSAccessKey}}
-  accessSecret: {{.AWSAccessSecret}}
+  accesskey: !value AWSAccessKey
+  accessSecret: !value AWSAccessSecret
   useCredentials: true
   verifySSL: false
   idpVerifySSL: true
