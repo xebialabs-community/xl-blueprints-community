@@ -118,7 +118,7 @@ docker-compose up
 * You can now apply the newly configured blueprint to XL Release and XL Deploy by opening a terminal, cd into your blueprint directory, then run
 
 ```bash
-    <path to your XL CLI Tool directory>/xl --config ~/.xebialabs/communityConfig.yaml apply
+    <path to your XL CLI Tool directory>/xl --config ~/.xebialabs/communityConfig.yaml apply -f xebialabs.yaml
 ```
 
 * Log into XL Release and run a release from the template 'Deploy Pet Clinic to AWS'
